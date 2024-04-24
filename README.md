@@ -1,4 +1,3 @@
-Školní repozitář pro databáze pro big data
-
-- cv04) obsahuje data pro docker
-- cv06) obsahuje cvičení 6
+# Databáze pro big data
+- školní repozitář pro práci s dockrem
+- využívám mongodb a elasticsearch
