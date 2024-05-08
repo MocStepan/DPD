@@ -1,0 +1,242 @@
+// 1.1
+PUT /orders-new
+{
+  "mappings": {
+   "properties": {
+     "created": {"type": "date"},
+     "items": {
+       "type": "nested",
+       "properties": {
+          "name": {"type": "text"},
+          "price": {"type": "float"}
+       }
+     },
+     "order_price": {"type": "float"},
+     "customer": {
+        "type": "nested",
+        "properties": {
+          "name": {"type": "text"}
+        }
+     }
+   } 
+  }
+}
+
+// 1.2
+POST /orders-new/_doc/1
+{
+  "created": "2002-09-02",
+  "items": [
+    {
+      "name": "item1",
+      "price": 25.05
+    },
+    {
+      "name": "item2",
+      "price": 10.00
+    }
+  ], 
+  "order_price": 35.05,
+  "customer": {
+    "name": "test"
+  }
+}
+
+
+// 2
+// vypíše slova za sebou podle indexu i s pozicí kde začínají a kde končí
+POST _analyze
+{
+  "text": "simple text analyzer 250-50",
+  "analyzer": "simple"
+}
+
+// stejné jak simple, akorát to rozpozná číslo od abecedy, nevinechává čísla
+POST _analyze
+{
+  "text": "simple text analyzer 250-50",
+  "analyzer": "standard"
+}
+
+// funguje jako standard, akorát rozdělí text jen podle mezer
+POST _analyze
+{
+  "text": "simple text analyzer 250-50",
+  "analyzer": "whitespace"
+}
+
+
+// 3
+GET /products/_search
+{
+  "size": 0,
+  "aggs": {
+    "max_price": {
+      "max": {
+        "field": "price"
+      }
+    },
+    "min_price": {
+      "min": {
+        "field": "price"
+      }
+    },
+    "avg_price": {
+      "avg": {
+        "field": "price"
+      }
+    }
+  }
+}
+
+GET /products/_search
+{
+  "size": 0,
+  "aggs": {
+    "amount_stats": {
+      "stats": {
+        "field": "price"
+      }
+    },
+    "max_sold": {
+      "max": {
+        "field": "sold"
+      }
+    }
+  }
+}
+
+GET /products/_search
+{
+  "size": 0,
+  "aggs": {
+    "tag_count": {
+      "terms": {
+        "field": "tags"
+      }
+    }
+  }
+}
+
+GET /products/_search
+{
+  "size": 0,
+  "aggs": {
+    "tag_count": {
+      "terms": {
+        "field": "tags"
+      },
+      "aggs": {
+        "tag_stats": {
+          "stats": {
+            "field": "price"
+          }
+        }
+      }
+    }
+  }
+}
+
+
+// 4
+GET /products/_search
+{
+  "size": 0,
+  "aggs": {
+    "filters_tags": {
+      "filter": {
+        "terms": {
+          "tags": ["Coffee", "Cake"]
+        }
+      },
+      "aggs": {
+        "filtered_tags": {
+          "terms": {
+            "field": "tags"
+          },
+          "aggs": {
+            "tag_stats": {
+              "stats": {
+                "field": "price"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+GET /orders/_search
+{
+  "size": 0,
+  "aggs": {
+    "statuses": {
+      "terms": {
+        "field": "status"
+      },
+      "aggs": {
+        "min_price": {
+          "min": {
+            "field": "total_amount"
+          }
+        },
+        "max_price": {
+          "max": {
+            "field": "total_amount"
+          }
+        },
+        "avg_price": {
+          "avg": {
+            "field": "total_amount"
+          }
+        }
+      }
+    }
+  }
+}
+
+GET /orders/_search
+{
+  "size": 0,
+  "aggs": {
+    "quarterly": {
+      "filters": {
+        "filters": {
+          "years": {
+            "range": {
+              "purchased_at": {
+                "gte": "2016-01-01",
+                "lte": "2016-12-31"
+              }
+            }
+          },
+          "N/A": {
+            "bool": {
+              "must_not": {
+                "exists": {
+                  "field": "purchased_at"
+                }
+              }
+            }
+          }
+        }
+      },
+      "aggs": {
+        "quearters": {
+          "date_histogram": {
+            "field": "purchased_at",
+            "calendar_interval": "quarter"
+          },
+          "aggs": {
+            "avg_price": {
+              "avg": {
+                "field": "total_amount"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

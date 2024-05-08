@@ -1,0 +1,149 @@
+// 1
+GET /products/_search
+{
+  "query": {
+    "term": {
+      "name": "coffee"
+    }
+  }
+}
+
+// 2
+GET /products/_search
+{
+  "query": {
+    "match": {
+      "name": {
+        "value": "cofee",
+        "fuzziness": "1"
+      }
+    }
+  }
+}
+
+// 3
+GET /products/_search
+{
+  "query": {
+    "term": {
+      "tags": {
+        "value": "Coffee"
+      }
+    }
+  }
+}
+
+// 4
+GET /products/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "term": 
+          {
+            "tags":
+            {
+              "value": "Coffee"
+            }
+          }
+        },
+        {
+          "range": 
+          {
+            "in_stock": 
+            {
+              "lte":10
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+
+// 5
+GET /products/_search
+{
+  "query": {
+    "bool": {
+      "must": {
+        "term": {
+          "name": "coffee"
+        }
+      },
+      "must_not": {
+        "term": {
+          "name": "cup"
+        }
+      }
+    }
+  },
+  "_source": ["name"]
+}
+
+// 6
+GET /products/_search
+{
+  "query": {
+   "bool": {
+     "filter": {
+        "range": {
+          "created": {
+            "gte": "2000/01/01"
+          }
+        }
+      }
+    } 
+  }
+}
+
+// 7
+GET /products/_search
+{
+  "query": {
+    "match_phrase": {
+      "name": {
+        "query": "Red Wine",
+        "slop": 0
+      }
+    }
+  }
+}
+
+// 8
+GET /products/_search
+{
+  "query": {
+    "prefix": {
+      "name": {
+        "value": "coffeecup"
+      }
+    }
+  },
+  "size": 5
+}
+
+// 9
+GET /products/_search
+{
+  "query": {
+    "multi_match": {
+      "query": "spaghetti",
+      "fields": ["name", "description", "ingredients"]
+    }
+  }
+}
+
+// 10
+GET /products/_search
+{
+  "query": {
+    "match_phrase": {
+      "title": {
+        "query": "Pasta Carbonara",
+        "slop": 2
+      }
+    }
+  }
+}
