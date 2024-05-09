@@ -5,7 +5,6 @@ PUT /orders-new
    "properties": {
      "created": {"type": "date"},
      "items": {
-       "type": "nested",
        "properties": {
           "name": {"type": "text"},
           "price": {"type": "float"}
@@ -13,7 +12,6 @@ PUT /orders-new
      },
      "order_price": {"type": "float"},
      "customer": {
-        "type": "nested",
         "properties": {
           "name": {"type": "text"}
         }
